@@ -79,14 +79,14 @@ if opt.data == 'GTSRB':
     #マスクのパス
     mask_path = path+f'mask{N}/'
     os.makedirs(mask_path,exist_ok=True)
-    aa='/data1/nisawa/gtsrb/gtsrb_vgg16/checkpoint/vgg16_sgd_weights.h5'
+
     #モデルの呼び出し
     model = vgg16(input_size,class_num)
     #マスクの作成
     if generate_new:
         generate_masks(mask_path,IMAGE_SIZE,N=N, s=s, p1=p_mask, savepath=maskname)
-    model.load_weights(aa)
-    #model.load_weights(checkpoint_path+model_name)
+
+    model.load_weights(checkpoint_path+model_name)
     image=cv2.imread(img_path+f'{opt.gtsrb_name}')
     images = cv2.resize(image,(IMAGE_SIZE,IMAGE_SIZE))
     if opt.hsv:
@@ -191,7 +191,7 @@ if opt.mode == 'RaCF_GradCAM':
     saliency = Saliency(explainer,test_images,test_labels,N)
     #重要度マップを出力、保存
     maps = saliency.make_gradcam_saliency(result_path,save_pickle=False)
-    plot_saliency(maps,test_images,image_name,result_path)
+    plot_saliency(maps,sample,image_name,result_path)
     #insertion,deletion実行
     if opt.run_ins_del:
         ins_del = Insertion_Deletion(maps,test_images,model,test_labels,N)
@@ -214,10 +214,11 @@ if opt.mode == 'MC-RISE':
     #クラスの呼び出し
     saliency = Saliency(explainer,test_images,test_labels,N)
     #重要度マップを出力、保存
-    maps = saliency.make_saliency(mask_path,save_pickle=False)
-    plot_saliency(maps,test_images,image_name,result_path)
+    #maps = saliency.make_saliency(mask_path,save_pickle=False)
+    #plot_saliency(maps,test_images,image_name,result_path)
     #それぞれの色で出力、保存
-    #sal = make_color_saliency(model,explainer,result_path)
+    maps = saliency.make_color_saliency(mask_path,save_pickle=False)
+    plot_color_saliency(maps,sample,image_name,result_path)
     #insertion,deletion実行
     if opt.run_ins_del:
         ins_del = Insertion_Deletion(maps,test_images,model,test_labels,N)

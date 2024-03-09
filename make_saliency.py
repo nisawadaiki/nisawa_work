@@ -64,7 +64,7 @@ class Saliency():
         cl_saliency_list=[]
         for i in tqdm(range(self.test_images.shape[0]), desc="Processing"):
             score_list,masks,bias_mask = self.explainer.forward(self.test_images[i])
-            score=np.expand_dims(score_list[:,true_labels[i]],axis=(-1, -2, -3))
+            score=np.expand_dims(score_list[:,self.true_labels[i]],axis=(-1, -2, -3))
             saliency = np.mean(masks*score,axis=0)
             saliency_list.append(saliency)
 
@@ -77,7 +77,7 @@ class Saliency():
             sal_light_blue_masks=np.mean(light_blue_masks*score,axis=0)
             sal_white_masks     =np.mean(white_masks*score,axis=0)
 
-            cl_saliency_list.append([sal_red_masks,sal_blue_masks,sal_green_masks,sal_yellow_masks,sal_purple_masks,sal_light_blue_masks,sal_white_masks ])
+            cl_saliency_list.append([sal_red_masks,sal_green_masks,sal_blue_masks,sal_yellow_masks,sal_purple_masks,sal_light_blue_masks,sal_white_masks ])
         #saliency_list=np.array(saliency_list)
         cl_saliency_list=np.array(cl_saliency_list)
         
@@ -87,4 +87,4 @@ class Saliency():
             with open(to_path+f"color_saliency{N}.pickle","wb") as aa:
                 pickle.dump(cl_saliency_list, aa,protocol=4)
         
-        return saliency_list
+        return cl_saliency_list

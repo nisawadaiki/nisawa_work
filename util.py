@@ -86,3 +86,32 @@ def plot_saliency(saliency,image,image_name,result_path):
     plt.tight_layout()
     plt.savefig(result_path+f'result_{image_name}.png')
     plt.close()
+
+def plot_color_saliency(saliency,image,image_name,result_path):
+    saliency = np.max(saliency,axis=-1)
+    saliency = normalization(saliency)
+    #pdb.set_trace()
+    #サブプロットを作成
+    fig, axs = plt.subplots(3, 3,figsize=(12, 12))
+    # プロットを設定
+    axs[0,0].imshow(saliency[0,0,:,:],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[0,0].set_title('red')
+    axs[0,1].imshow(saliency[0,1,:,:],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[0,1].set_title('green')
+    axs[0,2].imshow(saliency[0,2,:,:],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[0,2].set_title('blue')
+    axs[1,0].imshow(saliency[0,3,:,:],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[1,0].set_title('yellow')
+    axs[1,1].imshow(saliency[0,4,:,:],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[1,1].set_title('purple')
+    axs[1,2].imshow(saliency[0,5,:,:],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[1,2].set_title('light_blue')
+    axs[2,0].imshow(saliency[0,6,:,:],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[2,0].set_title('white')
+    axs[2,1].imshow(image[0])
+    axs[2,1].set_title('image')
+
+    # レイアウトを調整
+    plt.tight_layout()
+    plt.savefig(result_path+f'result_{image_name}.png')
+    plt.close()
