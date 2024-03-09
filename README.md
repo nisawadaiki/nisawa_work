@@ -18,9 +18,11 @@ $ git clone https://github.com/nisawadaiki/nisawa_work.git
 ```
 $ pip install -r requirements.txt
 ```
-3. Download each dataset and pretrained model, GTSRB(後でURL) and GTSRB prtrained model(後でURL) ImageNet(後でURL) to the corresponding data folder under each dataset folder as the following structure.
+3. Download each dataset and pretrained model, GTSRB() and GTSRB prtrained model(https://drive.google.com/file/d/1je-NzsfB9X1Y2nJQTrB0QYc0-i8LGHOv/view?usp=drive_link , https://drive.google.com/file/d/18GfZdHX4911gPC1KwZ2oPOYbKyms1NHs/view?usp=drive_link) ImageNet(後でURL)
 
-4. Execute run.py of each CAM method as follows:
+4. ダウンロードしたimagesの中のフォルダ、画像をGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/
+
+5. Execute run.py of each CAM method as follows:
 ```
 :$ python 
 (default):$ python run.py [-device_num] [-data] [-mode] [--make_mask] [-mask_num] [-eval_sal] [--run_ins_del] [--run_adcc] [--hsv]
