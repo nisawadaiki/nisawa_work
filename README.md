@@ -6,6 +6,7 @@ This repository provides data and codes
 3. Citation
 # Requirement
 + Python 3.7.10
++ tensprflow 2.2.0
 # Installation
 To get started with the project, follow these steps:
 1. Clone the repository.
@@ -19,24 +20,25 @@ $ pip install -r requirements.txt
 ```
 3. Download a zip file for each dataset, i.e., NCEDC and SF Police Call, from [Google Drive]   (https://drive.google.com/drive/folders/1bDROZjdKLxUslbnUY7q0JbxQZhG-KSin?usp=drive_link) and place unzipped files to the corresponding data folder under each dataset folder as the following structure.
 
-4. Execute Main.py of each dataset to train and evaluate models as follows:
+4. Execute Main.py of each CAM method as follows:
 ```
-(training):$ python Main.py [--train ] [-gene]
-(evaluation):$ python Main.py [-gene]
+:$ python 
+(default):$ python run.py [-device_num] [-data] [--train] [-mode] [--make_mask] [-mask_num] [-eval_sal] [--run_ins_del] [--run_adcc] [--make_imagenet] [--hsv]
 ```
 Option:
-- train :
-  - trainモード, 訓練時:True, 訓練済みモデルの検証:False, default:False
-- gene
-    - string: データセットの種類, default=h1
-      - hawkes1 : h1
-      - hawkes2 : h_fix05
-      - seismic datasets (NCEDC) : jisin
-      - SF police call datasets : 911_x_Address 
-- 　trainvec_num:
-  - int: seq_rep vecの数, default=3
-- 　pooling_k:
-  - int: anchor vecの数, default=3
+- device_num : int,default=0
+  - use GPU device number : deep1 0 or 1 (default:0)
+- data : string, default='GTSRB'
+    - dataset
+      - GTSRB
+      - ImageNet
+- --train : 指定しなければ学習しない
+    -GTSRBのモデルを学習するか否か   
+- 　mode: string, default='RaCF'
+  - method: RaCF, RaCF_GradCAN, MC-RISE
+  - evaluate:eval
+- 　--make_mask:　指定しなければマスクを作成しない(初回指定でマスクを作成、保存)
+  - make mask
 
 5. Exececute mse_all_ttest.py of each dataset to compare the performance of multiple models :
     ```
@@ -45,34 +47,16 @@ Option:
 # Structure of folders and files
 ```
 .
-├── Main.py
-├── Utils.py
-├── checkpoint
-├── kmeans.py
+├── run.py
+├── util.py
+├── make_saliency.py
+├── make_maks.py
 ├── requirements.txt
-├── data
-│   ├── Address
-│   ├── call1
-│   ├── call2
-│   ├── call3
-│   ├── data_selector.py
-│   ├── date_jisin.90016
-│   ├── date_pickled.py
-│   ├── h1
-│   └── h_fix05
-├── mse_all_ttest.py
-├── pickled
-├── related_works
-│   ├── FT_PP
-│   └── THP
-├── ronbun_plot_code.py
-└── transformer
-    ├── Constants.py
-    ├── Layers.py
-    ├── Models.py
-    ├── Modules.py
-    ├── SubLayers.py
-    └── __pycache__
+├──method
+├── GTSRB
+│   ├── code
+├── ImageNet
+
 ```
 # Seismic event data
 We used seismic event data provided by the Northern California Earthquake Data Center (NCEDC (2014)) and extracted 18,470 seismic events with a magnitude of larger than 3.0 recorded between 1970 and January 2022. The elapsed time τ is recorded in hours.
