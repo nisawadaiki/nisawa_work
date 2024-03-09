@@ -70,7 +70,7 @@ Option:
 # RaCF
 # tasks
 分類の際に、どのチャンネルが重要かを可視化する。RaCF,RaCF+GradCAM,MC-RISEの３つの手法を用いる。それぞれの手法のマップを生成するコマンドは以下のようになる。
-- GTSRBの場合(--make_maskは初回だけでよい)
+- GTSRBの場合(--make_maskは各マスク数において初回だけでよい)
 :RaCF(マスク数5000枚)
 ```
 :$ python run.py --make_mask
