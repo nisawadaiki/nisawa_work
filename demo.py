@@ -98,7 +98,7 @@ if opt.data == 'GTSRB':
     bb=model(test_images)
     #ラベルがあっていることを確認(stop[14],優先標識[12])
     test_labels=np.argmax(bb,axis=-1)
-    image_name = 'stop'
+    image_name = opt.gtsrb_name
     print(test_labels)
     sample = test_images
 elif opt.data == 'ImageNet':
