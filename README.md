@@ -68,8 +68,8 @@ Option:
 
 ```
 # RaCF
-We used seismic event data provided by the Northern California Earthquake Data Center (NCEDC (2014)) and extracted 18,470 seismic events with a magnitude of larger than 3.0 recorded between 1970 and January 2022. The elapsed time τ is recorded in hours.
-|| # of train | # of validation | # of test |
+We used RaCF and RaCF+GradCAM and MC-RISE.
+|| RaCF | RaCF+GradCAM | MC-RISE |
 |---| ---- | ---- | ---- |
 |# of events | 14,776   | 1,847         |  1,847  |
 |# of windows | 14,746   | 1,817         |  1,817  |
