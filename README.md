@@ -57,14 +57,12 @@ Option:
 │   ├── RaCFplusGardCAM.py
 │   ├── MC_RISE.py
 ├── GTSRB
-│   ├── code
-│       ├── evaluate.py
-│       ├── make_data.py
-│       ├── vgg16.py
+│   ├── evaluate.py
+│   ├── make_data.py
+│   ├── vgg16.py
 ├── ImageNet
-│   ├── code
-│       ├── evaluate.py
-│       ├── make_data.py
+│   ├── evaluate.py
+│   ├── make_data.py
 
 ```
 # RaCF
