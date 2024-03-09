@@ -20,7 +20,7 @@ $ pip install -r requirements.txt
 ```
 3. Download each dataset and pretrained model, GTSRB() and GTSRB prtrained model(https://drive.google.com/file/d/1je-NzsfB9X1Y2nJQTrB0QYc0-i8LGHOv/view?usp=drive_link , https://drive.google.com/file/d/18GfZdHX4911gPC1KwZ2oPOYbKyms1NHs/view?usp=drive_link) ImageNet(後でURL)
 
-4. ダウンロードしたimagesの中のフォルダ、画像をGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/
+4. ダウンロードしたimagesの中のフォルダ、画像をGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/result/checkpoint/のフォルダを作成し、その中に入れる
 
 5. Execute run.py of each CAM method as follows:
 ```
