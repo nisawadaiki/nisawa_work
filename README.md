@@ -68,41 +68,21 @@ Option:
 
 ```
 # RaCF
-We used RaCF and RaCF+GradCAM and MC-RISE.
-|| RaCF | RaCF+GradCAM | MC-RISE |
-|---| ---- | ---- | ---- |
-|# of events | 14,776   | 1,847         |  1,847  |
-|# of windows | 14,746   | 1,817         |  1,817  |
-
-To train or valid seq_rep_vec_Transformer_PP model, execute Main.py as follows :
-```python
-(train): $ python Main.py -gene=jisin --train
-(valid): $ python Main.py -gene=jisin
+# tasks
+分類の際に、どのチャンネルが重要かを可視化する。RaCF,RaCF+GradCAM,MC-RISEの３つの手法を用いる。それぞれを使用する際のコマンドは以下のようになる。
+GTSRBの場合
+RaCF(マスク数5000枚)
 ```
-
-# Police call event data
-We used police call event data provided by the City and County of
-San Francisco (San-Francisco (2021)). We extracted 55,262 events occurring at the first, second, and third most frequently recorded addresses, that is, 800 Block of BRYANT ST, 800 Block of MARKET ST, and 1000 Block of POTRERO AV, during 2003–2018 and created sliding windows for each address. For stratification, we selected windows whose last event τn+1 is recorded between 3:00 PM and 1:00 AM. The elapsed time is recorded in hours.
-|| # of train | # of validation | # of test |
-|---| ---- | ---- | ---- |
-|# of events | 44,228 | 5,510 | 5,524  |
-|# of windows |  24,314 | 3,006 | 2,965 |
-
-To train or valid seq_rep_vec_Transformer_PP model, execute Main.py as follows :
+:$ python run.py --make_mask
 ```
-first data
-(train):$ python Main.py -gene=911_1_Address --train
-(valid):$ python Main.py -gene=911_1_Address
-
-second data
-(train):$ python Main.py -gene=911_2_Address --train
-(valid):$ python Main.py -gene=911_2_Address
-
-third data
-(train):$ python Main.py -gene=911_3_Address --train
-(valid):$ python Main.py -gene=911_3_Address
+RaCF+GradCAM(マスク数5000枚)
 ```
-
+:$ python run.py -mode='Racf_GardCAM' --make_mask
+```
+RaCF(マスク数5000枚)
+```
+:$ python run.py -mode='MC-RISE' --make_mask
+```
 
 
 # Citation
