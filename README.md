@@ -111,7 +111,7 @@ MC-RISE
   -GTSRBは画像の名前を選ぶ ImageNetはpickleファイルにある画像をsplitすることで選択する 
 ```
 :$ python demo.py -mode='RaCF' -gtsrb_name='stop.jpg' --run_ins_del --run_adcc
-:$ python demo.py -data='ImageNet'-imagenet_split=50 -mode='RaCF' --run_ins_del --run_adcc
+:$ python demo.py -data='ImageNet' -imagenet_split=50 -mode='RaCF' --run_ins_del --run_adcc
 ```
 
 # Citation
