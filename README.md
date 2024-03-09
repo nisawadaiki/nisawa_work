@@ -18,7 +18,7 @@ $ git clone https://github.com/nisawadaiki/nisawa_work.git
 ```
 $ pip install -r requirements.txt
 ```
-3. Download each dataset and pretrained model, GTSRB(https://drive.google.com/drive/folders/1bDROZjdKLxUslbnUY7q0JbxQZhG-KSin?usp=drive_link) and GTSRB prtrained model() ImageNet() to the corresponding data folder under each dataset folder as the following structure.
+3. Download each dataset and pretrained model, GTSRB(後でURL) and GTSRB prtrained model(後でURL) ImageNet(後でURL) to the corresponding data folder under each dataset folder as the following structure.
 
 4. Execute run.py of each CAM method as follows:
 ```
@@ -71,7 +71,7 @@ Option:
 # tasks
 分類の際に、どのチャンネルが重要かを可視化する。RaCF,RaCF+GradCAM,MC-RISEの３つの手法を用いる。それぞれの手法のマップを生成するコマンドは以下のようになる。
 - GTSRBの場合(--make_maskは初回だけでよい)
-RaCF(マスク数5000枚)
+:RaCF(マスク数5000枚)
 ```
 :$ python run.py --make_mask
 ```
@@ -84,7 +84,7 @@ RaCF(マスク数5000枚)
 :$ python run.py -mode='MC-RISE'
 ```
 - ImageNetの場合(--make_maskは初回だけでよい)
-RaCF(マスク数5000枚)
+:RaCF(マスク数5000枚)
 ```
 :$ python run.py -data='ImageNet' --make_mask
 ```
@@ -95,6 +95,24 @@ RaCF+GradCAM(マスク数5000枚)
 RaCF(マスク数5000枚)
 ```
 :$ python run.py -mode='MC-RISE' -data='ImageNet' 
+```
+- 手法の評価:RaCF
+```
+:$ python run.py -mode='eval' -eval_sal='RaCF' --run_ins_del --run_adcc
+```
+Racf_GardCAM
+```
+:$ python run.py -mode='eval' -eval_sal='Racf_GardCAM' --run_ins_del --run_adcc
+```
+MC-RISE
+```
+:$ python run.py -mode='eval' -eval_sal='MC-RISE' --run_ins_del --run_adcc
+```
+
+- demo.pyを使用することで、画像単体でのチャンネル重要度の可視化とinsertion,deletion,ADCCの結果を見ることができる(modeは3つから選ぶ)
+```
+:$ python demo.py -mode='RaCF' --run_ins_del --run_adcc
+:$ python demo.py -data='ImageNet' -mode='RaCF' --run_ins_del --run_adcc
 ```
 
 # Citation
