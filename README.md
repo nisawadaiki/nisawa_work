@@ -1,17 +1,16 @@
 # nisawa_work
-This repository provides data and codes used in the paper <em>A novel Transformer-based fully trainable point process</em> to Neuralcomputation.
+This repository provides data and codes
 # Contents
 1. Instlation
 2. Structure of folders and files
 3. Citation
 # Requirement
-+ Python 3.7.13
-+ Pytorch 1.11.0
++ Python 3.7.10
 # Installation
 To get started with the project, follow these steps:
 1. Clone the repository.
 ```
-$ git clone https://github.com/chihhar/seq_rep_vec_Transformer_PP.git
+$ git clone https://github.com/nisawadaiki/nisawa_work.git
 ```
 
 2.  Install the required packages from the requirements.txt file using conda:
