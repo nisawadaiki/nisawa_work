@@ -110,9 +110,10 @@ MC-RISE
 ```
 
 - demo.pyを使用することで、画像単体でのチャンネル重要度の可視化とinsertion,deletion,ADCCの結果を見ることができる(modeは3つから選ぶ)
+  -GTSRBは画像の名前を選ぶ ImageNetはpickleファイルにある画像をsplitすることで選択する 
 ```
-:$ python demo.py -mode='RaCF' --run_ins_del --run_adcc
-:$ python demo.py -data='ImageNet' -mode='RaCF' --run_ins_del --run_adcc
+:$ python demo.py -mode='RaCF' -gtsrb_name='stop.jpg' --run_ins_del --run_adcc
+:$ python demo.py -data='ImageNet'-imagenet_split=50 -mode='RaCF' --run_ins_del --run_adcc
 ```
 
 # Citation
