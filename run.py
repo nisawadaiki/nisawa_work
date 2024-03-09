@@ -55,9 +55,9 @@ maskname = 'masks.npy'
 print(f'dataset:{opt.data}')
 #GTSRBの時の設定
 if opt.data == 'GTSRB':
-    from GTSRB.code.evaluate import *
-    from GTSRB.code.make_data import *
-    from GTSRB.code.vgg16 import *
+    from GTSRB.evaluate import *
+    from GTSRB.make_data import *
+    from GTSRB.vgg16 import *
     #画像の大きさ
     IMAGE_SIZE= 96
     #チャンネル数
@@ -93,8 +93,8 @@ if opt.data == 'GTSRB':
         model.load_weights(checkpoint_path+model_name)
         test_images,test_labels = currnnt_data(model,data_num,IMAGE_SIZE)
 elif opt.data == 'ImageNet':
-    from ImageNet.code.make_data import *
-    from ImageNet.code.evaluate import *
+    from ImageNet.make_data import *
+    from ImageNet.evaluate import *
     IMAGE_SIZE=224
     model = tf.keras.applications.resnet50.ResNet50(include_top=True,weights='imagenet')
     #pickleデータのパス
@@ -103,7 +103,7 @@ elif opt.data == 'ImageNet':
     to_path = path+'result/'
     os.makedirs(to_path,exist_ok=True)
 
-    pickle_path = '/data1/nisawa/imagenet/pickle/'
+    pickle_path = path + 'images/pickle/'
     os.makedirs(pickle_path,exist_ok=True)
     #ラベル情報のファイルパス
     input_file_path= '/data1/nisawa/imagenet/val.txt'
@@ -245,11 +245,13 @@ if opt.mode == 'eval':
 
     with open(result_path+f"saliency{N}.pickle","rb") as aa:
         saliency=pickle.load(aa)
+    
+    name = '_'
 
     #insertion,deletion実行
     if opt.run_ins_del:
         ins_del = Insertion_Deletion(saliency,test_images,model,test_labels,N)
-        ins_del.insertion_deletion_run(result_path)
+        ins_del.insertion_deletion_run(result_path,name)
     #adccを実行
     if opt.run_adcc:
         adcc = Adcc(saliency,explainer,model,test_images,test_labels,maskname,p_mask,N)

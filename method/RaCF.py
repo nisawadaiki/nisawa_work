@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-from skimage.transform import resize
 from tqdm import tqdm
 import pdb
 import random
@@ -23,47 +22,6 @@ class Racf(tf.Module):
         self.model = model
         self.dataset = dataset
         self.gpu_batch = gpu_batch
-
-    def generate_masks(self,to_path,image_size, N, s, p1, savepath):
-
-        #ランダムにマスクするかしないかを決める
-        grid = np.random.rand(N, s, s) < p1
-        grid = grid.astype('float32')
-        grid=np.expand_dims(grid,axis=-1)
-        #チャンネルを１から３次元に
-        grid_ch = np.concatenate([grid,grid,grid],axis=-1)
-        
-        """
-        ch_list = [np.array([[1, 1, 1]]),np.array([[1, 0, 0]]), 
-                np.array([[0, 1, 0]]),np.array([[0, 0, 1]]),np.array([[1, 1, 0]]),
-                np.array([[1, 0, 1]]), np.array([[0, 1, 1]])]
-        """
-        
-        #上記のリストを生成するコード(0番目に[0,0,0]を含むため、ch_numで0番目のリスト選ばないようにする)
-        ch_list = [np.array([[(i >> 2) & 1, (i >> 1) & 1, i & 1]]) for i in range(8)]
-        ch_num = list(range(1, 8))
-
-        #どのチャンネルを保持するかのマスクを作成
-        for n in range(N):
-            for i in range(grid_ch.shape[1]):
-                for j in range(grid_ch.shape[2]):
-                    if grid_ch[n,i,j,0] == 1.0:
-                        grid_ch[n,i,j] = ch_list[random.choice(ch_num)]
- 
-
-        self.masks = np.zeros((N, image_size,image_size,grid_ch.shape[3]))
-        #マスクの大きさを入力と同じに
-        for i in tqdm(range(N), desc='Generating filters'):
-            self.masks[i, :, :] = cv2.resize(grid_ch[i], (image_size,image_size))
-
-        np.save(to_path+savepath, self.masks)
-        aa=np.where((np.sum(self.masks,axis=-1))>1,1,np.sum(self.masks,axis=-1))
-        mask0 = 1 - aa
-        self.mask0 = np.expand_dims(mask0,axis=-1)
-        self.N = N
-        self.p1 = p1
-
-        return self.masks
 
     def load_masks(self, to_path,filepath1,p1):
         self.masks = np.load(to_path+filepath1)

@@ -55,9 +55,9 @@ maskname = 'masks.npy'
 print(f'dataset:{opt.data}')
 #GTSRBの時の設定
 if opt.data == 'GTSRB':
-    from GTSRB.code.evaluate import *
-    from GTSRB.code.make_data import *
-    from GTSRB.code.vgg16 import *
+    from GTSRB.evaluate import *
+    from GTSRB.make_data import *
+    from GTSRB.vgg16 import *
     #画像の大きさ
     IMAGE_SIZE= 96
     #チャンネル数
@@ -73,21 +73,21 @@ if opt.data == 'GTSRB':
     #モデル保存のpath
     checkpoint_path = to_path+'checkpoint/'
     os.makedirs(checkpoint_path,exist_ok=True)
-    model_name = 'vgg16_weights.h5'
+    model_name = 'vgg16_sgd_weights.h5'
     #画像のパス
-    img_path = '/data1/nisawa/gtsrb/image/'
+    img_path = path+'images/'
     #マスクのパス
     mask_path = path+f'mask{N}/'
     os.makedirs(mask_path,exist_ok=True)
-
+    aa='/data1/nisawa/gtsrb/gtsrb_vgg16/checkpoint/vgg16_sgd_weights.h5'
     #モデルの呼び出し
     model = vgg16(input_size,class_num)
     #マスクの作成
     if generate_new:
         generate_masks(mask_path,IMAGE_SIZE,N=N, s=s, p1=p_mask, savepath=maskname)
-    
-    model.load_weights(checkpoint_path+model_name)
-    image=cv2.imread(f'{img_path}+{opt.gtsrb_name}')
+    model.load_weights(aa)
+    #model.load_weights(checkpoint_path+model_name)
+    image=cv2.imread(img_path+f'{opt.gtsrb_name}')
     images = cv2.resize(image,(IMAGE_SIZE,IMAGE_SIZE))
     if opt.hsv:
         images = cv2.cvtColor(images, cv2.COLOR_BGR2HSV)
@@ -102,8 +102,8 @@ if opt.data == 'GTSRB':
     print(test_labels)
     sample = test_images
 elif opt.data == 'ImageNet':
-    from ImageNet.code.make_data import *
-    from ImageNet.code.evaluate import *
+    from ImageNet.make_data import *
+    from ImageNet.evaluate import *
     IMAGE_SIZE=224
     mean = [103.939, 116.779, 123.68]
     model = tf.keras.applications.resnet50.ResNet50(include_top=True,weights='imagenet')
@@ -113,7 +113,7 @@ elif opt.data == 'ImageNet':
     to_path = path+'result/'
     os.makedirs(to_path,exist_ok=True)
 
-    pickle_path = '/data1/nisawa/imagenet/pickle/'
+    pickle_path = path + 'images/pickle/'
     os.makedirs(pickle_path,exist_ok=True)
     #ラベル情報のファイルパス
     input_file_path= '/data1/nisawa/imagenet/val.txt'
@@ -169,11 +169,11 @@ if opt.mode == 'RaCF' :
     #insertion,deletion実行
     if opt.run_ins_del:
         ins_del = Insertion_Deletion(maps,test_images,model,test_labels,N)
-        ins_del.insertion_deletion_run(result_path,image_name)
+        ins_del.insertion_deletion_run(result_path,image_name,run=False)
     #adccを実行
     if opt.run_adcc:
         adcc = Adcc(maps,explainer,model,test_images,test_labels,maskname,p_mask,N)
-        adcc.adcc_run(opt.mode,result_path,mask_path)
+        adcc.adcc_run(opt.mode,result_path,mask_path,run=False)
 
 #RaCF+GradCAMの実行、保存
 if opt.mode == 'RaCF_GradCAM':
@@ -195,11 +195,11 @@ if opt.mode == 'RaCF_GradCAM':
     #insertion,deletion実行
     if opt.run_ins_del:
         ins_del = Insertion_Deletion(maps,test_images,model,test_labels,N)
-        ins_del.insertion_deletion_run(result_path,image_name)
+        ins_del.insertion_deletion_run(result_path,image_name,run=False)
     #adccを実行
     if opt.run_adcc:
         adcc = Adcc(maps,explainer,model,test_images,test_labels,maskname,p_mask,N)
-        adcc.adcc_run(opt.mode,result_path,mask_path)
+        adcc.adcc_run(opt.mode,result_path,mask_path,run=False)
 
 #MC-RISEの実行、保存
 if opt.mode == 'MC-RISE':
@@ -221,8 +221,8 @@ if opt.mode == 'MC-RISE':
     #insertion,deletion実行
     if opt.run_ins_del:
         ins_del = Insertion_Deletion(maps,test_images,model,test_labels,N)
-        ins_del.insertion_deletion_run(result_path,image_name)
+        ins_del.insertion_deletion_run(result_path,image_name,run=False)
     #adccを実行
     if opt.run_adcc:
         adcc = Adcc(maps,explainer,model,test_images,test_labels,maskname,p_mask,N)
-        adcc.adcc_run(opt.mode,result_path,mask_path)
+        adcc.adcc_run(opt.mode,result_path,mask_path,run=False)

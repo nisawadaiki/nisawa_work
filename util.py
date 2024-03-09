@@ -16,7 +16,7 @@ def parser_run():
     parser.add_argument("--run_ins_del",action="store_true",help='True:run False:not run')
     parser.add_argument("--run_adcc",action="store_true",help='True:run False:not run')
     parser.add_argument("--make_imagenet",action="store_true")
-    parser.add_argument("-hsv",action="store_true")
+    parser.add_argument("--hsv",action="store_true")
     return parser
 
 def parser_demo():
@@ -33,7 +33,7 @@ def parser_demo():
     parser.add_argument("--make_imagenet",action="store_true")
     parser.add_argument("-gtsrb_name",type=str, default="stop.jpg")
     parser.add_argument("-imagenet_split",type=int, default=50)
-    parser.add_argument("-hsv",action="store_true")
+    parser.add_argument("--hsv",action="store_true")
     return parser
 
 def plot_LossAcc(history,to_path): 
@@ -70,14 +70,19 @@ def normalization(saliency):
 #チャンネル数を3と想定
 def plot_saliency(saliency,image,image_name,result_path):
     saliency = normalization(saliency)
-    #pdb.set_trace()
-    for i in range(saliency.shape[3]):
-        plt.subplot(2,2,i+1)
-        plt.imshow(saliency[0,:,:,i],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
-        plt.axis('off')
-    plt.subplot(2,2,4)
-    plt.imshow(image[0])
-    plt.axis('off')
+    #サブプロットを作成
+    fig, axs = plt.subplots(1, 4,figsize=(12, 3))
+    # プロットを設定
+    axs[0].imshow(saliency[0,:,:,0],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[0].set_title('red')
+    axs[1].imshow(saliency[0,:,:,1],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[1].set_title('green')
+    axs[2].imshow(saliency[0,:,:,2],vmin=saliency.min(),vmax=saliency.max(),cmap='jet')
+    axs[2].set_title('blue')
+    axs[3].imshow(image[0])
+    axs[3].set_title('image')
+
+    # レイアウトを調整
     plt.tight_layout()
     plt.savefig(result_path+f'result_{image_name}.png')
     plt.close()

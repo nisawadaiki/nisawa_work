@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-from skimage.transform import resize
 from tqdm import tqdm
 import pdb
 import random

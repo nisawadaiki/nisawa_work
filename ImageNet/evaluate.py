@@ -13,10 +13,10 @@ def normalization(saliency):
     mask = (saliency - min_value) / (max_value - min_value)
     return mask
 
-def plot_ins_del(threshold, scores,ins_del,name,N):
+def plot_ins_del(threshold, scores,ins_del,name,N,result_path):
     plt.plot(threshold, scores, color="blue")
     plt.fill_between(threshold, np.array(scores)[:], color="lightblue")
-    plt.ylim(bottom=0, top=1)
+    plt.ylim(bottom=0, top=1.01)
     plt.savefig(result_path+f"{ins_del}_{name}_{N}.png")
     plt.close()
 
@@ -33,7 +33,7 @@ class Insertion_Deletion():
         return (np.sum(arr) - arr[0] / 2 - arr[-1] / 2) / (np.array(arr).size - 1)
     
 
-    def insertion_deletion_run(self,result_path,name):
+    def insertion_deletion_run(self,result_path,name,run=True):
         auc_scores = {'del': [], 'ins': []}
         #どの割合で挿入削除していくのかを決定
         ratio = np.arange(0.0, 1.01, 0.036)
@@ -71,7 +71,8 @@ class Insertion_Deletion():
             scores = (insetion_score - score_min) / (score_max - score_min)
             scores = np.maximum(scores,0)
             scores = np.minimum(scores,1)
-            plot_ins_del(threshold, scores,ins_del,name,self.N,result_path)
+            if run==False:
+                plot_ins_del(threshold, scores,ins_del,name,self.N,result_path)
             auc_scores['ins'].append(self.auc(scores))
         ins_score = np.mean(auc_scores['ins'])
         print("end_insertion")
@@ -102,24 +103,26 @@ class Insertion_Deletion():
             scores = (deletion_score - score_min) / (score_max - score_min)
             scores = np.maximum(scores,0)
             scores = np.minimum(scores,1)
-            plot_ins_del(threshold, scores,ins_del,name,self.N,result_path)
+            if run==False:
+                plot_ins_del(threshold, scores,ins_del,name,self.N,result_path)
             auc_scores['del'].append(self.auc(scores))
         del_score = np.mean(auc_scores['del'])
         print("end_deletion")
         print(del_score)
         #結果をテキストに保存
-        with open(result_path+f"result_ins_del_{self.N}.txt", "w") as o:
-            print(f"insertion:{ins_score}\n", file=o)
-            print(f"deletion:{del_score}\n", file=o)
+        if run:
+            with open(result_path+f"result_ins_del_{self.N}.txt", "w") as o:
+                print(f"insertion:{ins_score}\n", file=o)
+                print(f"deletion:{del_score}\n", file=o)
 
 class Adcc():
-    def __init__(self,saliency,explainer,model,test_images,test_labels,maskpath,p_mask,N):
+    def __init__(self,saliency,explainer,model,test_images,test_labels,maskname,p_mask,N):
         self.saliency = saliency
         self.explainer = explainer
         self.model = model
         self.test_images = test_images
         self.test_labels = test_labels
-        self.maskpath = maskpath
+        self.maskname = maskname
         self.p_mask = p_mask
         self.N = N
 
@@ -174,32 +177,43 @@ class Adcc():
         return adcc
 
     #実際にADCCを走らせるコード(ADCCはもう一度手法にかける必要あり)
-    def adcc_run(self,result_path):
+    def adcc_run(self,mode, result_path, mask_path,run=True):
 
         norm_saliency = normalization(self.saliency)
         #camを元画像に適用して、もう一度手法にかける
         mean = [103.939, 116.779, 123.68]
-        sample = test_images+mean
+        sample = self.test_images+mean
         sample=np.where(sample>255,255,sample)
         sample=np.where(sample<0,0,sample)
-        for i in range(test_images.shape[0]):
+        for i in range(self.test_images.shape[0]):
             sample[i] = cv2.cvtColor(sample[i].astype(np.uint8), cv2.COLOR_BGR2RGB)
         test_images2 = sample*norm_saliency
         for i in range(test_images2.shape[0]):
             test_images2[i]=cv2.cvtColor(test_images2[i].astype(np.uint8), cv2.COLOR_RGB2BGR)
         explanation_map = np.array(test_images2) - mean
 
-        self.explainer.load_masks(result_path,self.maskpath,p1=self.p_mask)
+        self.explainer.load_masks(mask_path,self.maskname,p1=self.p_mask)
 
         saliency_list=[]
         for i in tqdm(range(self.test_images.shape[0]), desc="Processing"):
             score_list,masks,base_mask = self.explainer.forward(explanation_map[i])
             score=np.expand_dims(score_list[:,self.test_labels[i]],axis=(-1,-2,-3))
             saliency = np.mean(masks*score,axis=0)
+            if mode == 'RaCF_GradCAM':
+                #GradCAMによって評価されない領域を、評価領域の最低値に合わせる
+                #たまにsaliencyが0の時があるため、場合わけ
+                if saliency.min()==saliency.max():
+                    saliency_list.append(saliency)
+                    continue
+                aa=np.reshape(saliency,[-1])
+                bb=np.sort(aa,axis=-1)
+                min_num = np.where(bb>0)[0][0]
+                saliency=np.where(saliency<=0,bb[min_num],saliency)
             saliency_list.append(saliency)
         saliency_B=np.array(saliency_list)
-        with open(result_path+f"saliency_B{self.N}.pickle","wb") as aa:
-            pickle.dump(saliency_B, aa,protocol=4)
+        if run:
+            with open(result_path+f"saliency_B{self.N}.pickle","wb") as aa:
+                pickle.dump(saliency_B, aa,protocol=4)
 
         norm_saliency_B = normalization(saliency_B)
 
@@ -209,8 +223,9 @@ class Adcc():
             adcc_list.append(score)
         all_scores = np.mean(adcc_list)
         print(all_scores)
-        with open(result_path+f"result_adcc{self.N}.txt", "w") as o:
-            print(f"adcc:{all_scores}\n", file=o)
+        if run:
+            with open(result_path+f"result_adcc{self.N}.txt", "w") as o:
+                print(f"adcc:{all_scores}\n", file=o)
 
 
 

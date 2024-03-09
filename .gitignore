@@ -1,5 +1,4 @@
 *.npy
 *.h5
 *.pickle
-*.png
 __pycache__/

@@ -32,7 +32,7 @@ class Insertion_Deletion():
         return (np.sum(arr) - arr[0] / 2 - arr[-1] / 2) / (np.array(arr).size - 1)
     
 
-    def insertion_deletion_run(self,result_path,name):
+    def insertion_deletion_run(self,result_path,name,run=True):
         auc_scores = {'del': [], 'ins': []}
         #どの割合で挿入削除していくのかを決定
         ratio = np.arange(0.0, 1.01, 0.036)
@@ -62,7 +62,8 @@ class Insertion_Deletion():
             scores = (insetion_score - score_min) / (score_max - score_min)
             scores = np.maximum(scores,0)
             scores = np.minimum(scores,1)
-            plot_ins_del(threshold, scores,ins_del,name,self.N,result_path)
+            if run==False:
+                plot_ins_del(threshold, scores,ins_del,name,self.N,result_path)
             auc_scores['ins'].append(self.auc(scores))   
         ins_score = np.mean(auc_scores['ins'])
         print("end_insertion")
@@ -90,24 +91,26 @@ class Insertion_Deletion():
             scores = (deletion_score - score_min) / (score_max - score_min)
             scores = np.maximum(scores,0)
             scores = np.minimum(scores,1)
-            plot_ins_del(threshold, scores,ins_del,name,self.N,result_path)
+            if run==False:
+                plot_ins_del(threshold, scores,ins_del,name,self.N,result_path)
             auc_scores['del'].append(self.auc(scores))
         del_score = np.mean(auc_scores['del'])
         print("end_deletion")
         print(del_score)
-        #結果をテキストに保存
-        with open(result_path+f"result_ins_del_{self.N}.txt", "w") as o:
-            print(f"insertion:{ins_score}\n", file=o)
-            print(f"deletion:{del_score}\n", file=o)
+        if run:
+            #結果をテキストに保存
+            with open(result_path+f"result_ins_del_{self.N}.txt", "w") as o:
+                print(f"insertion:{ins_score}\n", file=o)
+                print(f"deletion:{del_score}\n", file=o)
 
 class Adcc():
-    def __init__(self,saliency,explainer,model,test_images,test_labels,maskpath,p_mask,N):
+    def __init__(self,saliency,explainer,model,test_images,test_labels,maskname,p_mask,N):
         self.saliency = saliency
         self.explainer = explainer
         self.model = model
         self.test_images = test_images
         self.test_labels = test_labels
-        self.maskpath = maskpath
+        self.maskname = maskname
         self.p_mask = p_mask
         self.N = N
 
@@ -162,15 +165,13 @@ class Adcc():
         return adcc
 
     #実際にADCCを走らせるコード(ADCCはもう一度手法にかける必要あり)
-    def adcc_run(self, mode, result_path, mask_path):
+    def adcc_run(self, mode, result_path, mask_path,run=True):
 
         norm_saliency = normalization(self.saliency)
         #camを元画像に適用して、もう一度手法にかける
         explanation_map = self.test_images*norm_saliency
 
-        self.explainer.load_masks(mask_path,self.maskpath,p1=self.p_mask)
-
-        
+        self.explainer.load_masks(mask_path,self.maskname,p1=self.p_mask)
 
         saliency_list=[]
         for i in tqdm(range(self.test_images.shape[0]), desc="Processing"):
@@ -187,11 +188,11 @@ class Adcc():
                 bb=np.sort(aa,axis=-1)
                 min_num = np.where(bb>0)[0][0]
                 saliency=np.where(saliency<=0,bb[min_num],saliency)
-                saliency_list.append(saliency)
-                saliency_list.append(saliency)
+            saliency_list.append(saliency)
         saliency_B=np.array(saliency_list)
-        with open(result_path+f"saliency_B{self.N}.pickle","wb") as aa:
-            pickle.dump(saliency_B, aa,protocol=4)
+        if run:
+            with open(result_path+f"saliency_B{self.N}.pickle","wb") as aa:
+                pickle.dump(saliency_B, aa,protocol=4)
 
         norm_saliency_B = normalization(saliency_B)
 
@@ -201,8 +202,9 @@ class Adcc():
             adcc_list.append(score)
         all_scores = np.mean(adcc_list)
         print(all_scores)
-        with open(result_path+f"result_adcc{self.N}.txt", "w") as o:
-            print(f"adcc:{all_scores}\n", file=o)
+        if run:
+            with open(result_path+f"result_adcc{self.N}.txt", "w") as o:
+                print(f"adcc:{all_scores}\n", file=o)
 
 
 
