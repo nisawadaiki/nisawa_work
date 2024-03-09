@@ -18,12 +18,12 @@ $ git clone https://github.com/nisawadaiki/nisawa_work.git
 ```
 $ pip install -r requirements.txt
 ```
-3. Download a zip file for each dataset, i.e., NCEDC and SF Police Call, from [Google Drive]   (https://drive.google.com/drive/folders/1bDROZjdKLxUslbnUY7q0JbxQZhG-KSin?usp=drive_link) and place unzipped files to the corresponding data folder under each dataset folder as the following structure.
+3. Download each dataset and pretrained model, GTSRB(https://drive.google.com/drive/folders/1bDROZjdKLxUslbnUY7q0JbxQZhG-KSin?usp=drive_link) and GTSRB prtrained model() ImageNet() to the corresponding data folder under each dataset folder as the following structure.
 
-4. Execute Main.py of each CAM method as follows:
+4. Execute run.py of each CAM method as follows:
 ```
 :$ python 
-(default):$ python run.py [-device_num] [-data] [--train] [-mode] [--make_mask] [-mask_num] [-eval_sal] [--run_ins_del] [--run_adcc] [--make_imagenet] [--hsv]
+(default):$ python run.py [-device_num] [-data] [-mode] [--make_mask] [-mask_num] [-eval_sal] [--run_ins_del] [--run_adcc] [--hsv]
 ```
 Option:
 - device_num : int,default=0
@@ -32,18 +32,18 @@ Option:
     - dataset
       - GTSRB
       - ImageNet
-- --train : 指定しなければ学習しない
-    -GTSRBのモデルを学習するか否か   
 - 　mode: string, default='RaCF'
   - method: RaCF, RaCF_GradCAN, MC-RISE
   - evaluate:eval
-- 　--make_mask:　指定しなければマスクを作成しない(初回指定でマスクを作成、保存)
-  - make mask
+- --make_mask:　指定しなければ作ったマスクをロード(指定でマスクを作成、保存)
+- -mask_num: int ,default=5000
+    - マスク数を決める　どのマスク数のフォルダを指定するかも含まれるので5000枚以外は必ず指定
+-  -eval_sal : string ,default='RaCF'
+    - -mode='eval'の時、どの手法を評価するかを決定  
+- --run_ins_del: -mode='eval'の時、指定することで評価指標insertion,deletionを実行
+- --run_adcc: -mode='eval'の時、指定することで評価指標adccを実行
+- --hsv:指定することでGTSRBのデータをHSVに変換
 
-5. Exececute mse_all_ttest.py of each dataset to compare the performance of multiple models :
-    ```
-    $ python mse_all_ttest.py
-    ```
 # Structure of folders and files
 ```
 .
@@ -52,13 +52,22 @@ Option:
 ├── make_saliency.py
 ├── make_maks.py
 ├── requirements.txt
-├──method
+├── method
+│   ├── RaCF.py
+│   ├── RaCFplusGardCAM.py
+│   ├── MC_RISE.py
 ├── GTSRB
 │   ├── code
+│       ├── evaluate.py
+│       ├── make_data.py
+│       ├── vgg16.py
 ├── ImageNet
+│   ├── code
+│       ├── evaluate.py
+│       ├── make_data.py
 
 ```
-# Seismic event data
+# RaCF
 We used seismic event data provided by the Northern California Earthquake Data Center (NCEDC (2014)) and extracted 18,470 seismic events with a magnitude of larger than 3.0 recorded between 1970 and January 2022. The elapsed time τ is recorded in hours.
 || # of train | # of validation | # of test |
 |---| ---- | ---- | ---- |
