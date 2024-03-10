@@ -44,25 +44,27 @@ class Insertion_Deletion():
         sample = self.test_images+mean
         sample=np.where(sample>255,255,sample)
         sample=np.where(sample<0,0,sample)
-        sample = [cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_BGR2RGB) for img in sample]
+        #BGR->RGB
+        sample = sample[:,:,:,::-1]
+
     
         print("run_start")
         #全テスト画像を回す
         print("start_insertion")
         ins_del = 'ins'
-        for jj in tqdm(range(self.test_images.shape[0]), desc="Processing"):
+        for image_number in tqdm(range(self.test_images.shape[0]), desc="Processing"):
             insetion_score=[]
 
             #重要度順に画像のチャンネルを挿入していく
-            for i in threshold[::-1]:         
-                ins_mask = np.where(mask[jj]>=i,1.,0.)
-                mask_images = sample[jj] * ins_mask
+            for ins_rate in threshold[::-1]:         
+                ins_mask = np.where(mask[image_number]>=ins_rate,1.,0.)
+                mask_images = sample[image_number] * ins_mask
 
                 mask_images=cv2.cvtColor(mask_images.astype(np.uint8), cv2.COLOR_RGB2BGR)
                 mask_test_images = np.array(mask_images) - mean
                 
                 preds = self.model.predict(np.expand_dims(mask_test_images,axis=0))
-                score = preds[0, self.label[jj]]
+                score = preds[0, self.label[image_number]]
                 insetion_score.append(score)
               
             insetion_score = np.array(insetion_score)
@@ -80,20 +82,20 @@ class Insertion_Deletion():
     
         #全テスト画像を回す
         ins_del = 'del'
-        for jj in tqdm(range(self.test_images.shape[0]), desc="Processing"):
+        for image_number in tqdm(range(self.test_images.shape[0]), desc="Processing"):
             deletion_score=[]
 
-            for i in threshold[::-1]:            
-                del_mask = np.where(mask[jj]<=i,1,0)
-                mask_images = sample[jj] * del_mask
+            for del_rate in threshold[::-1]:            
+                del_mask = np.where(mask[image_number]<=del_rate,1,0)
+                mask_images = sample[image_number] * del_mask
                 mask_images=cv2.cvtColor(mask_images.astype(np.uint8), cv2.COLOR_RGB2BGR)
                 mask_test_images = np.array(mask_images) - mean
-                if i==0.0:
+                if del_rate==0.0:
                     #全てが0値の時は、0の代わりに0.1を入れる
                     mask_test_images = np.full_like(mask_test_images, 0.1)
                 
                 preds = self.model.predict(np.expand_dims(mask_test_images,axis=0))
-                score = preds[0,self.label[jj]]
+                score = preds[0,self.label[image_number]]
                 deletion_score.append(score)
             
             deletion_score = np.array(deletion_score)
@@ -185,11 +187,10 @@ class Adcc():
         sample = self.test_images+mean
         sample=np.where(sample>255,255,sample)
         sample=np.where(sample<0,0,sample)
-        for i in range(self.test_images.shape[0]):
-            sample[i] = cv2.cvtColor(sample[i].astype(np.uint8), cv2.COLOR_BGR2RGB)
+        sample = sample[:,:,:,::-1]
+    
         test_images2 = sample*norm_saliency
-        for i in range(test_images2.shape[0]):
-            test_images2[i]=cv2.cvtColor(test_images2[i].astype(np.uint8), cv2.COLOR_RGB2BGR)
+        test_images2 = test_images2[:,:,:,::-1]
         explanation_map = np.array(test_images2) - mean
 
         self.explainer.load_masks(mask_path,self.maskname,p1=self.p_mask)
@@ -222,7 +223,7 @@ class Adcc():
             score = self.ADCC(self.test_images[i:i+1], norm_saliency[i], explanation_map[i], self.model, norm_saliency_B[i], self.test_labels[i])
             adcc_list.append(score)
         all_scores = np.mean(adcc_list)
-        print(all_scores)
+        print(f'adcc:{all_scores}')
         if run:
             with open(result_path+f"result_adcc{self.N}.txt", "w") as o:
                 print(f"adcc:{all_scores}\n", file=o)

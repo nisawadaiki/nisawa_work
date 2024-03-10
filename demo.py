@@ -73,26 +73,31 @@ if opt.data == 'GTSRB':
     #モデル保存のpath
     checkpoint_path = to_path+'checkpoint/'
     os.makedirs(checkpoint_path,exist_ok=True)
-    model_name = 'vgg16_sgd_weights.h5'
     #画像のパス
     img_path = path+'images/'
     #マスクのパス
     mask_path = path+f'mask{N}/'
     os.makedirs(mask_path,exist_ok=True)
 
+    layer_name='conv2d_12'
+
     #モデルの呼び出し
     model = vgg16(input_size,class_num)
+
     #マスクの作成
     if generate_new:
         generate_masks(mask_path,IMAGE_SIZE,N=N, s=s, p1=p_mask, savepath=maskname)
 
-    model.load_weights(checkpoint_path+model_name)
     image=cv2.imread(img_path+f'{opt.gtsrb_name}')
     images = cv2.resize(image,(IMAGE_SIZE,IMAGE_SIZE))
     if opt.hsv:
         images = cv2.cvtColor(images, cv2.COLOR_BGR2HSV)
+        model_name = 'vgg16_sgd_hsv_weights.h5'
     else:
         images = cv2.cvtColor(images, cv2.COLOR_BGR2RGB)
+        model_name = 'vgg16_sgd_weights.h5'
+    model.load_weights(checkpoint_path+model_name)
+    #画像の処理
     images=np.expand_dims(images,axis=0)
     test_images = images/255.
     bb=model(test_images)
@@ -121,6 +126,8 @@ elif opt.data == 'ImageNet':
     #画像が格納されたディレクトリのパス
     image_dir = "/data1/nisawa/imagenet/val_images"
 
+    layer_name='conv5_block3_3_conv'
+
     #マスクのパス
     mask_path = path+f'mask{N}/'
     os.makedirs(mask_path,exist_ok=True)
@@ -138,6 +145,7 @@ elif opt.data == 'ImageNet':
     if generate_new:
         generate_masks(mask_path,IMAGE_SIZE,N=N, s=s, p1=p_mask, savepath=maskname)
     
+    #目で見て決めたものなので、変更する余地はかなりあり　色の偏っているものを見つける？
     use_labels = np.array([1,40,277,402,404,499,566,817,919,943,945,949,950,951,954])
     test_images,test_labels = make_data_15class(images, use_labels, labels, model)
     test_images,test_labels = test_images[opt.imagenet_split:opt.imagenet_split+1],test_labels[opt.imagenet_split:opt.imagenet_split+1]
@@ -145,8 +153,8 @@ elif opt.data == 'ImageNet':
     sample = test_images+mean
     sample=np.where(sample>255,255,sample)
     sample=np.where(sample<0,0,sample)
-    sample = cv2.cvtColor(sample[0].astype(np.uint8), cv2.COLOR_BGR2RGB)
-    sample = np.expand_dims(sample,axis=0) /255
+    sample = sample[:,:,:,::-1]
+    sample = sample /255.
 
 
 print(f'mode:{opt.mode}')
@@ -178,7 +186,6 @@ if opt.mode == 'RaCF' :
 #RaCF+GradCAMの実行、保存
 if opt.mode == 'RaCF_GradCAM':
     from method.RaCFplusGradCAM import *
-    layer_name='conv2d_12'
     explainer = RaCF_GradCAM(model,opt.data,layer_name)
     result_path = to_path+f'gradcam_racf/mask_num{N}/'
     os.makedirs(result_path,exist_ok=True)
@@ -214,16 +221,16 @@ if opt.mode == 'MC-RISE':
     #クラスの呼び出し
     saliency = Saliency(explainer,test_images,test_labels,N)
     #重要度マップを出力、保存
-    #maps = saliency.make_saliency(mask_path,save_pickle=False)
+    maps_3ch = saliency.make_saliency(mask_path,save_pickle=False)
     #plot_saliency(maps,test_images,image_name,result_path)
     #それぞれの色で出力、保存
     maps = saliency.make_color_saliency(mask_path,save_pickle=False)
     plot_color_saliency(maps,sample,image_name,result_path)
     #insertion,deletion実行
     if opt.run_ins_del:
-        ins_del = Insertion_Deletion(maps,test_images,model,test_labels,N)
+        ins_del = Insertion_Deletion(maps_3ch,test_images,model,test_labels,N)
         ins_del.insertion_deletion_run(result_path,image_name,run=False)
     #adccを実行
     if opt.run_adcc:
-        adcc = Adcc(maps,explainer,model,test_images,test_labels,maskname,p_mask,N)
+        adcc = Adcc(maps_3ch,explainer,model,test_images,test_labels,maskname,p_mask,N)
         adcc.adcc_run(opt.mode,result_path,mask_path,run=False)

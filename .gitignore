@@ -2,3 +2,4 @@
 *.h5
 *.pickle
 __pycache__/
+images/

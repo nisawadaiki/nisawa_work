@@ -65,6 +65,7 @@ if opt.data == 'GTSRB':
     input_size = (IMAGE_SIZE,IMAGE_SIZE,C)
     #クラス数
     class_num = 43
+
     #結果格納するパス
     path = f'/data1/nisawa/nisawa_works/{opt.data}/'
     #結果を保存するpath
@@ -73,12 +74,13 @@ if opt.data == 'GTSRB':
     #モデル保存のpath
     checkpoint_path = to_path+'checkpoint/'
     os.makedirs(checkpoint_path,exist_ok=True)
-    model_name = 'vgg16_weights.h5'
     #画像のパス
-    img_path = '/data1/nisawa/gtsrb/image/'
+    img_path = path+'images'
     #マスクのパス
     mask_path = path+f'mask{N}/'
     os.makedirs(mask_path,exist_ok=True)
+
+    layer_name='conv2d_12'
 
     #モデルの呼び出し
     model = vgg16(input_size,class_num)
@@ -90,8 +92,17 @@ if opt.data == 'GTSRB':
     data_num=1000
     #分類に成功した画像のみを選択
     if opt.train==False:
-        model.load_weights(checkpoint_path+model_name)
-        test_images,test_labels = currnnt_data(model,data_num,IMAGE_SIZE)
+        if opt.hsv:
+            print('HSV')
+            model_name = 'vgg16_sgd_hsv_weights.h5'
+            model.load_weights(checkpoint_path+model_name)
+            test_images,test_labels = correct_hsv_data(model,data_num,IMAGE_SIZE)
+        else:
+            print('RGB')
+            model_name = 'vgg16_sgd_weights.h5'
+            model.load_weights(checkpoint_path+model_name)
+            test_images,test_labels = correct_data(model,data_num,IMAGE_SIZE)
+        
 elif opt.data == 'ImageNet':
     from ImageNet.make_data import *
     from ImageNet.evaluate import *
@@ -111,11 +122,12 @@ elif opt.data == 'ImageNet':
     #画像が格納されたディレクトリのパス
     image_dir = "/data1/nisawa/imagenet/val_images"
 
+    layer_name='conv5_block3_3_conv'
     #マスクのパス
     mask_path = path+f'mask{N}/'
     os.makedirs(mask_path,exist_ok=True)
 
-    #初めて動作させるときはTrue：pickleファイルができたら指定しなくてよい(RGB->BGRで中心化されていることに注意)
+    #初めて動作させるときはTrue：pickleファイルがあるなら指定しなくてよい(RGB->BGRで中心化されていることに注意)
     if opt.make_imagenet:
         make_imagenet_data(IMAGE_SIZE, input_file_path, label_file, image_dir, pickle_path)
     
@@ -130,6 +142,7 @@ elif opt.data == 'ImageNet':
     
     use_labels = np.array([1,40,277,402,404,499,566,817,919,943,945,949,950,951,954])
     test_images,test_labels = make_data_15class(images, use_labels, labels, model)
+    test_images,test_labels = test_images[0:2],test_labels[0:2]
 
 #学習(GTSRBの時のみ)
 if opt.train:
@@ -186,30 +199,18 @@ if opt.mode == 'RaCF' :
 #RaCF+GradCAMの実行、保存
 if opt.mode == 'RaCF_GradCAM':
     from method.RaCFplusGradCAM import *
-    explainer = RaCF_GradCAM(model,opt.data)
+    explainer = RaCF_GradCAM(model,opt.data,layer_name)
     result_path = to_path+f'gradcam_racf/mask_num{N}/'
     os.makedirs(result_path,exist_ok=True)
 
     #GardCAM
-    gradcam_list=[]
-    layer_name='conv2d_12'
-    for i in tqdm(range(test_images.shape[0]), desc="Processing"):
-        saliency = explainer.grad_cam(model,test_images[i] , layer_name)
-        gradcam_list.append(saliency)
-    gradcam_list = np.array(gradcam_list)
-    #閾値より大きい箇所だけにサンプリング対象を限定
-    for i in range(gradcam_list.shape[0]):
-        sort_sal=np.sort(np.reshape(gradcam_list[i],[-1]))
-        threshold = sort_sal[int(len(sort_sal)*0.7)]
-        gradcam_list[i]=np.where(gradcam_list[i]>threshold,1,0)
- 
     masks=explainer.load_masks(mask_path,maskname,p1=p_mask)
     print('Masks are loaded.')
 
     #クラスの呼び出し
     saliency = Saliency(explainer,test_images,test_labels,N)
     #重要度マップを出力、保存
-    maps = saliency.make_gradcam_saliency(gradcam_list,result_path,save_pickle=True)
+    maps = saliency.make_gradcam_saliency(result_path,save_pickle=True)
 
 #MC-RISEの実行、保存
 if opt.mode == 'MC-RISE':
@@ -241,7 +242,7 @@ if opt.mode == 'eval':
     if opt.eval_sal=='RaCF_GradCAM':
         from method.RaCFplusGradCAM import *
         result_path = to_path+f'gradcam_racf/mask_num{N}/'
-        explainer = RaCF_GradCAM(model,opt.data)
+        explainer = RaCF_GradCAM(model,opt.data,layer_name)
 
     with open(result_path+f"saliency{N}.pickle","rb") as aa:
         saliency=pickle.load(aa)

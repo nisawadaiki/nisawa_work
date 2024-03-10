@@ -10,9 +10,9 @@ def processing_imagenet_image(image,masks,mean= [103.939, 116.779, 123.68]):
     bgr_image = image+mean
     bgr_image=np.where(bgr_image>255,255,bgr_image)
     bgr_image=np.where(bgr_image<0,0,bgr_image)
-    rgb_image= cv2.cvtColor(bgr_image[0].astype(np.uint8), cv2.COLOR_BGR2RGB)
+    rgb_image= bgr_image[0,:,:,::-1]
     mask_image = rgb_image *masks
-    mask_image_bgr=[cv2.cvtColor(mask_image[i].astype(np.uint8), cv2.COLOR_RGB2BGR) for i in range(mask_image.shape[0])]
+    mask_image_bgr=mask_image[:,:,:,::-1]
     stack = np.array(mask_image_bgr) - mean
     return stack
 

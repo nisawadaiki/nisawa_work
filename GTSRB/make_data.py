@@ -52,11 +52,27 @@ def load_test_data(image_resize,csv_path='/data1/nisawa/gtsrb/image/Test.csv'):
     data = np.array(data)
     return data,labels
 
-def currnnt_data(model, data_num, image_resize):
+def correct_data(model, data_num, image_resize):
     data,labels = load_test_data(image_resize)
     test_images = np.zeros((data.shape[0],data.shape[1],data.shape[2],data.shape[3]))
     for i in range(data.shape[0]):
         rgb = cv2.cvtColor(data[i], cv2.COLOR_BGR2RGB)
+        test_images[i] = rgb/255.
+
+    predict=model.predict(test_images[:data_num])
+    predict_label=(np.argmax(predict,axis=-1))
+    # 誤ったラベルを除外
+    correct_indices = (predict_label == labels[:data_num])
+    model_outputs = predict_label[correct_indices]
+    true_labels = labels[:data_num][correct_indices]
+    test_images=test_images[:data_num][correct_indices]
+    return test_images,true_labels
+
+def correct_hsv_data(model, data_num, image_resize):
+    data,labels = load_test_data(image_resize)
+    test_images = np.zeros((data.shape[0],data.shape[1],data.shape[2],data.shape[3]))
+    for i in range(data.shape[0]):
+        rgb = cv2.cvtColor(data[i], cv2.COLOR_BGR2HSV)
         test_images[i] = rgb/255.
 
     predict=model.predict(test_images[:data_num])
