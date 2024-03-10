@@ -18,11 +18,11 @@ $ git clone https://github.com/nisawadaiki/nisawa_work.git
 ```
 $ pip install -r requirements.txt
 ```
-3. Download each dataset and pretrained model, GTSRB() and GTSRB prtrained model(https://drive.google.com/file/d/1je-NzsfB9X1Y2nJQTrB0QYc0-i8LGHOv/view?usp=drive_link , https://drive.google.com/file/d/18GfZdHX4911gPC1KwZ2oPOYbKyms1NHs/view?usp=drive_link) ImageNet(後でURL)
+3. Download each dataset and pretrained model, GTSRB() and GTSRB prtrained model(https://drive.google.com/file/d/1je-NzsfB9X1Y2nJQTrB0QYc0-i8LGHOv/view?usp=drive_link , https://drive.google.com/file/d/18GfZdHX4911gPC1KwZ2oPOYbKyms1NHs/view?usp=drive_link) ImageNet(ファイルがでかいため置ける場所がないです)
 
-4. ダウンロードしたimagesの中のフォルダ、画像をGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/result/checkpoint/のフォルダを作成し、その中に入れる
+5. ダウンロードしたzipを解凍し、imagesの中のフォルダをGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/result/checkpoint/のフォルダを作成し、その中に入れる。ImageNetは、zipを解凍し、/data1/nisawa/nisawa_works/ImageNet/images/pickle/フォルダを作り、中に入れる。
 
-5. Execute run.py of each CAM method as follows:
+6. Execute run.py of each CAM method as follows:
 ```
 :$ python 
 (default):$ python run.py [-device_num] [-data] [-mode] [--make_mask] [-mask_num] [-eval_sal] [--run_ins_del] [--run_adcc] [--hsv]
@@ -115,5 +115,10 @@ MC-RISE
 :$ python demo.py -mode='RaCF' -gtsrb_name='stop.jpg' --run_ins_del --run_adcc
 :$ python demo.py -data='ImageNet' -imagenet_split=50 -mode='RaCF' --run_ins_del --run_adcc
 ```
+- 結果の例 (python demo.py -data='ImageNet' -imagenet_split=50 -mode='RaCF' --run_ins_del --run_adccを実行、ターミナル上にinsertion,deletion,adccの数値が出てきます)
+  - 重要度マップ
+       ![Image](ImageNet/result/racf/mask_num5000/result_50.png)
+  - insertion,deletion
+      - ![Image](ImageNet/result/racf/mask_num5000/ins_50_5000.png) ![Image](ImageNet/result/racf/mask_num5000/del_50_5000.png)
 
 # Citation
