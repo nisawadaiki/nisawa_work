@@ -52,6 +52,12 @@ p_mask=0.5
 #マスク名
 maskname = 'masks.npy'
 
+#作業フォルダ
+path = f'/data1/nisawa/nisawa_works/{opt.data}/'
+#結果を保存するpath
+to_path = path+'result/'
+os.makedirs(to_path,exist_ok=True)
+
 print(f'dataset:{opt.data}')
 #GTSRBの時の設定
 if opt.data == 'GTSRB':
@@ -66,11 +72,6 @@ if opt.data == 'GTSRB':
     #クラス数
     class_num = 43
 
-    #結果格納するパス
-    path = f'/data1/nisawa/nisawa_works/{opt.data}/'
-    #結果を保存するpath
-    to_path = path+'result/'
-    os.makedirs(to_path,exist_ok=True)
     #モデル保存のpath
     checkpoint_path = to_path+'checkpoint/'
     os.makedirs(checkpoint_path,exist_ok=True)
@@ -108,12 +109,8 @@ elif opt.data == 'ImageNet':
     from ImageNet.evaluate import *
     IMAGE_SIZE=224
     model = tf.keras.applications.resnet50.ResNet50(include_top=True,weights='imagenet')
+    
     #pickleデータのパス
-    path = f'/data1/nisawa/nisawa_works/{opt.data}/'
-    #結果を保存するpath
-    to_path = path+'result/'
-    os.makedirs(to_path,exist_ok=True)
-
     pickle_path = path + 'images/pickle/'
     os.makedirs(pickle_path,exist_ok=True)
     #ラベル情報のファイルパス
