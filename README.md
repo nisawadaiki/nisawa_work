@@ -22,10 +22,9 @@ $ pip install -r requirements.txt
 
 5. ダウンロードしたzipを解凍し、data1/.../image/の中のすべてのフォルダ、ファイルをGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/result/checkpoint/のフォルダを作成し、その中に入れる。ImageNetは、zipを解凍し中にあるpickleファイルを、/data1/nisawa/nisawa_works/ImageNet/images/pickle/フォルダを作り、中に入れる。
 
-6. Execute run.py of each CAM method as follows:
+6. Execute run.py of CAM method as follows:
 ```
-:$ python 
-(default):$ python run.py [-device_num] [-data] [-mode] [--make_mask] [-mask_num] [-eval_sal] [--run_ins_del] [--run_adcc] [--hsv]
+:$ python run.py [-device_num] [-data] [-mode] [--make_mask] [-mask_num] [-eval_sal] [--run_ins_del] [--run_adcc] [--hsv]
 ```
 Option:
 - device_num : int,default=0
