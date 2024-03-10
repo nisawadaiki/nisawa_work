@@ -18,7 +18,7 @@ $ git clone https://github.com/nisawadaiki/nisawa_work.git
 ```
 $ pip install -r requirements.txt
 ```
-3. Download each dataset and pretrained model, GTSRB() and GTSRB prtrained model(https://drive.google.com/file/d/1je-NzsfB9X1Y2nJQTrB0QYc0-i8LGHOv/view?usp=drive_link , https://drive.google.com/file/d/18GfZdHX4911gPC1KwZ2oPOYbKyms1NHs/view?usp=drive_link) ImageNet(後でURL)
+3. Download each dataset and pretrained model, GTSRB(後でURL) and GTSRB prtrained model(https://drive.google.com/file/d/1je-NzsfB9X1Y2nJQTrB0QYc0-i8LGHOv/view?usp=drive_link , https://drive.google.com/file/d/18GfZdHX4911gPC1KwZ2oPOYbKyms1NHs/view?usp=drive_link) ImageNet(後でURL)
 
 5. ダウンロードしたzipを解凍し、中のフォルダをGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/result/checkpoint/のフォルダを作成し、その中に入れる。ImageNetは、zipを解凍し、/data1/nisawa/nisawa_works/ImageNet/images/pickle/フォルダを作り、中に入れる。
 
@@ -67,11 +67,10 @@ Option:
 │   ├── make_data.py
 
 ```
-# RaCF
 # tasks
 分類の際に、どのチャンネルが重要かを可視化する。RaCF,RaCF+GradCAM,MC-RISEの３つの手法を用いる。それぞれの手法のマップを生成するコマンドは以下のようになる。
-- GTSRBの場合(--make_maskは各マスク数において初回だけでよい)
-:RaCF(マスク数5000枚)
+## GTSRBの場合(--make_maskは各マスク数において初回だけでよい)
+RaCF(マスク数5000枚)
 ```
 :$ python run.py --make_mask
 ```
@@ -83,7 +82,7 @@ RaCF(マスク数5000枚)
 ```
 :$ python run.py -mode='MC-RISE'
 ```
-- ImageNetの場合(--make_maskは初回だけでよい)
+## ImageNetの場合(--make_maskは初回だけでよい)
 :RaCF(マスク数5000枚)
 ```
 :$ python run.py -data='ImageNet' --make_mask
@@ -96,7 +95,8 @@ RaCF(マスク数5000枚)
 ```
 :$ python run.py -mode='MC-RISE' -data='ImageNet' 
 ```
-- 手法の評価:RaCF
+## 手法の評価
+RaCF
 ```
 :$ python run.py -mode='eval' -eval_sal='RaCF' --run_ins_del --run_adcc
 ```
