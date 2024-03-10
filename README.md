@@ -18,9 +18,9 @@ $ git clone https://github.com/nisawadaiki/nisawa_work.git
 ```
 $ pip install -r requirements.txt
 ```
-3. Download each dataset and pretrained model, GTSRB(後でURL) and GTSRB prtrained model(https://drive.google.com/file/d/1je-NzsfB9X1Y2nJQTrB0QYc0-i8LGHOv/view?usp=drive_link , https://drive.google.com/file/d/18GfZdHX4911gPC1KwZ2oPOYbKyms1NHs/view?usp=drive_link) ImageNet(後でURL)
+3. Download each dataset and pretrained model, GTSRB(https://drive.google.com/file/d/1qoSXE2XHnkiuF5U2RYLrtrNexIyqYh9q/view?usp=drive_link) and GTSRB prtrained model(https://drive.google.com/file/d/1je-NzsfB9X1Y2nJQTrB0QYc0-i8LGHOv/view?usp=drive_link , https://drive.google.com/file/d/18GfZdHX4911gPC1KwZ2oPOYbKyms1NHs/view?usp=drive_link)　, ImageNet(https://drive.google.com/file/d/1vHN-IoRxqJgK1ucECq71FubPsRfLIIA_/view?usp=drive_link)
 
-5. ダウンロードしたzipを解凍し、中のフォルダをGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/result/checkpoint/のフォルダを作成し、その中に入れる。ImageNetは、zipを解凍し、/data1/nisawa/nisawa_works/ImageNet/images/pickle/フォルダを作り、中に入れる。
+5. ダウンロードしたzipを解凍し、data1/.../image/の中のすべてのフォルダ、ファイルをGTSRB/images/の中に入れる。学習済みモデルファイル(h5)はGTSRB/result/checkpoint/のフォルダを作成し、その中に入れる。ImageNetは、zipを解凍し中にあるpickleファイルを、/data1/nisawa/nisawa_works/ImageNet/images/pickle/フォルダを作り、中に入れる。
 
 6. Execute run.py of each CAM method as follows:
 ```
